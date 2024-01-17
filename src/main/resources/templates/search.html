@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>选课查询</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#search-btn").click(function () {
+                var validate = $("#serch_nameorsid").form("validate");
+                var res = document.getElementById("serch_nameorsid").value;
+                if (!validate) {
+                    alert("请完整填写信息！");
+                    return;
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "/search/SearchStudentCourse",
+                        data: "info=" + res,
+                        success:function (json) {
+                            $('#searchStudentCourseList').datagrid("loadData", json);
+                        }
+                    });
+                }
+            })
+            $("#search-course_btn").click(function () {
+                var validate = $("#serch_cnameorcid").form("validate");
+                var ras = document.getElementById("serch_cnameorcid").value;
+                if (!validate) {
+                    alert("请完整填写信息！");
+                    return;
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "/search/SearchSelectedCourse",
+                        data: "info=" + ras,
+                        success:function (json) {
+                            $('#searchSelectedCourseList').datagrid("loadData", json);
+                        }
+                    });
+                }
+            })
+            $("#return").click(function () {
+                location.href="user"
+            })
+        })
+    </script>
+</head>
+
+<body>
+
+<div style="margin:0 0 0 0;"></div>
+
+    <div title="选课" style="padding: 0">
+        <div class="easyui-tabs" style="width:1200px;height:800px">
+            <div title="根据学生信息" style="padding:6px">
+                <div id = "search_big" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator">
+                    <div style="float:left"; id="return" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true">返回首页</div>
+                    <div id = "search_small" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator"> &nbsp  &nbsp请输入学生姓名或学号&nbsp  &nbsp<input id="serch_nameorsid" class="easyui-textbox" name="search_nameorsid">
+                        <a id="search-btn" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">
+                            搜索</a>
+                    </div>
+                    <br>
+                    <table id="searchStudentCourseList" class="easyui-datagrid"  style="width:100%;height:150%;margin: auto"
+                           data-options="singleSelect:true,collapsible:true,method:'get'">
+                        <thead>
+                        <tr>
+                            <th data-options="field:'chk', checkbox:true, width:50"></th>
+                            <th data-options="field:'sid', title:'学号', width:150, sortable:true">学号</th>
+                            <th data-options="field:'sname', title:'姓名',width:300">姓名</th>
+                            <th data-options="field:'cid', title:'课程编号', width:100">课程编号</th>
+                            <th data-options="field:'cname', title:'课程名称', width:150">课程名称</th>
+                            <th data-options="field:'sel_year', title:'选课年份', width:150">选课年份</th>
+                            <th data-options="field:'score', title:'成绩', width:200">成绩</th>
+                        </tr>
+                        </thead>
+                    </table>
+
+                </div>
+            </div>
+            <div title="根据课程信息" style="padding:6px">
+                <div id = "search_course_big" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator">
+                    <div id = "search_course_sma" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator"> &nbsp  &nbsp请输入课程名称或编号&nbsp  &nbsp<input id="serch_cnameorcid" class="easyui-textbox" name="search_cnameorcid">
+                        <a id="search-course_btn" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">
+                            搜索</a>
+                    </div>
+                    <br>
+                    <table id="searchSelectedCourseList" class="easyui-datagrid"  style="width:100%;height:150%;margin: auto"
+                           data-options="singleSelect:true,collapsible:true,method:'get'">
+                        <thead>
+                        <tr>
+                            <th data-options="field:'chk', checkbox:true, width:50"></th>
+                            <th data-options="field:'sid', title:'学号', width:150, sortable:true">学号</th>
+                            <th data-options="field:'sname', title:'姓名',width:300">姓名</th>
+                            <th data-options="field:'cid', title:'课程编号', width:100">课程编号</th>
+                            <th data-options="field:'cname', title:'课程名称', width:150">课程名称</th>
+                            <th data-options="field:'sel_year', title:'选课年份', width:150">选课年份</th>
+                            <th data-options="field:'score', title:'成绩', width:200">成绩</th>
+                        </tr>
+                        </thead>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+
+</div>
+</body>
+</html>

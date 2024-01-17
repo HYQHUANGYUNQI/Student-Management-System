@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>成绩查询</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //学生学号/姓名和课程编号/名称查询某科成绩
+            $("#search-btn").click(function () {
+                var ras = document.getElementById("infoForm").value;
+                var validate = $("infoForm").form("validate");
+                //var res = document.getElementById("serch_nameorsid").value;
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/search/SearchScore",
+                        data: $("#infoForm").serialize(),
+                        error:function() {
+                        },
+                        success:function (json) {
+
+                            $('#searchStudentCourseList').datagrid("loadData", json);
+                        }
+                    });
+
+            })
+            //学生学号/姓名查询平均成绩
+            $("#search-btn").click(function () {
+                var temp = document.getElementById("sidorsname").value;
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchStudentAvgScore",
+                    data:"sidorsname=" + temp,
+                    success:function (msg) {
+                        document.getElementById("avgscore").innerHTML = msg;
+                    }
+                })
+            })
+
+            //班级名称查询平均成绩
+            $("#search-btn-one").click(function () {
+                var temp = document.getElementById("clazz").value;
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchClazzAvgTotalScore",
+                    data:"clazz=" + temp,
+                    success:function (msg) {
+                        document.getElementById("clazzavgscoreall").innerHTML = msg;
+                    }
+                })
+
+            })
+
+            //班级名称和课程编号查询某科平均成绩
+            $("#search-btn-one").click(function () {
+                var temp1 = document.getElementById("clazz").value;
+                var temp2 = document.getElementById("cidorcname_clazz").value
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchClazzAvgScore",
+                    data:"clazz=" + temp1 + "&cidorcname=" + temp2,
+                    success:function (msg) {
+                        document.getElementById("clazzavgscore").innerHTML = msg;
+                    }
+                })
+            })
+
+            //课程编号/名称查询课程平均成绩
+            $("#search-btn-two").click(function () {
+                var temp = document.getElementById("cidorcname_score").value;
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchCourseAvgScore",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("avgcoursescore").innerHTML = msg;
+                    }
+                })
+                //成绩为满分的人数
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchAA",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("AA").innerHTML = msg;
+                    }
+                })
+                //成绩为90 - 99的人数
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchA",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("A").innerHTML = msg;
+                    }
+                })
+                //成绩为80 - 89的人数
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchB",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("B").innerHTML = msg;
+                    }
+                })
+                //成绩为70 - 79的人数
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchC",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("C").innerHTML = msg;
+                    }
+                })
+                //成绩为60 - 69的人数
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchD",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("D").innerHTML = msg;
+                    }
+                })
+                //成绩小于60分的人数
+                $.ajax({
+                    type:"GET",
+                    url:"/search/SearchE",
+                    data:"cnameorcid=" + temp,
+                    success:function (msg) {
+                        document.getElementById("E").innerHTML = msg;
+                    }
+                })
+            })
+            $("#return").click(function () {
+                location.href="user"
+            })
+
+        })
+    </script>
+</head>
+<body>
+<div style="margin:0 0 0 0;"></div>
+<div title="选课" style="padding: 0">
+    <div class="easyui-tabs" style="width:1200px;height:800px">
+        <div title="学生成绩" style="padding:6px">
+            <div id = "search_big" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator">
+                <div style="float:left"; id="return" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true">返回首页</div>
+                <div id = "search_small" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator">
+                    <form id="infoForm" method="GET">
+                        &nbsp  &nbsp请输入学号或学生姓名&nbsp  &nbsp<input id="sidorsname" class="easyui-textbox" name="sidorsname">
+                        &nbsp  &nbsp请输入课程编号或课程名称&nbsp  &nbsp<input id="cidorcname" class="easyui-textbox" name="cidorcname">
+                        <a id="search-btn" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">
+                            搜索</a>
+                    </form>
+                </div>
+                &nbsp;&nbsp;
+                <a>学生总平均分：</a>
+                <a id="avgscore"></a>
+                <br><br>
+                <table id="searchStudentCourseList" class="easyui-datagrid"  style="width:100%;height:150%;margin: auto"
+                       data-options="singleSelect:true,collapsible:true,method:'get'">
+                    <thead>
+                    <tr>
+                        <th data-options="field:'chk', checkbox:true, width:50"></th>
+                        <th data-options="field:'sid', title:'学号', width:150, sortable:true">学号</th>
+                        <th data-options="field:'sname', title:'姓名',width:300">姓名</th>
+                        <th data-options="field:'cid', title:'课程编号', width:100">课程编号</th>
+                        <th data-options="field:'cname', title:'课程名称', width:150">课程名称</th>
+                        <th data-options="field:'sel_year', title:'选课年份', width:150">选课年份</th>
+                        <th data-options="field:'score', title:'成绩', width:200">成绩</th>
+                    </tr>
+                    </thead>
+                </table>
+
+            </div>
+        </div>
+
+        <div title="班级成绩" style="padding:6px">
+            <form id="clazzscoreForm" method="GET">
+                &nbsp  &nbsp请输入班级名称&nbsp  &nbsp<input id="clazz" class="easyui-textbox" name="clazz">
+                &nbsp  &nbsp请输入课程编号或课程名称&nbsp  &nbsp<input id="cidorcname_clazz" class="easyui-textbox" name="cidorcname">
+                <a id="search-btn-one" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">
+                    搜索</a>
+                <br>
+            </form>
+            &nbsp;&nbsp;<a>班级该课程平均分：</a>
+            <a id="clazzavgscore"></a>
+            <br><br>
+            &nbsp;&nbsp;<a>班级总平均分：</a>
+            <a id="clazzavgscoreall"></a>
+            <br><br>
+<!--            <table id="searchStudentCourseList" class="easyui-datagrid"  style="width:100%;height:150%;margin: auto"-->
+<!--                   data-options="singleSelect:true,collapsible:true,method:'get'">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th data-options="field:'chk', checkbox:true, width:50"></th>-->
+<!--                    <th data-options="field:'clazz', title:'班级', width:150, sortable:true">班级</th>-->
+<!--                    <th data-options="field:'cid', title:'课程编号',width:300">课程编号</th>-->
+<!--                    <th data-options="field:'avgscore', title:'班级课程成绩', width:100">班级课程成绩</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--            </table>-->
+        </div>
+
+        <div title="课程成绩" style="padding:6px">
+<!--            <div id = "search_big_two" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator">-->
+<!--                <div id = "search_small_tow" style="flowt:left;margin-top:4px;" class="datagrid-btn-seprator">-->
+                    <form id="coursescoreForm" method="GET">
+                        &nbsp  &nbsp请输入课程编号或课程名称&nbsp  &nbsp<input id="cidorcname_score" class="easyui-textbox" name="cnameorcid">
+                        <a id="search-btn-two" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">
+                            搜索</a>
+                    </form>
+
+<!--                </div>-->
+                &nbsp;&nbsp;
+                <a>课程总平均分：</a>
+                <a id="avgcoursescore"></a>
+                <br><br>
+                &nbsp;&nbsp;<a>成绩分布(/人)</a>
+                <br><br>
+            &nbsp;&nbsp;<a >100分：</a>
+                <a id="AA"></a>
+                <br><br>
+            &nbsp;&nbsp;<a >90 - 99分：</a>
+                <a id="A"></a>
+                <br><br>
+            &nbsp;&nbsp;<a >80 - 89分:</a>
+                <a id="B"></a>
+                <br><br>
+            &nbsp;&nbsp;<a >70 - 79分：</a>
+                <a id="C"></a>
+                <br><br>
+            &nbsp;&nbsp;<a >60 - 69分：</a>
+                <a id="D"></a>
+                <br><br>
+            &nbsp;&nbsp;<a >不及格：</a>
+                <a id="E"></a>
+
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

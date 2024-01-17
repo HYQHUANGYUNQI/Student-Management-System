@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //删除
+            $("#delete").click(function () {
+                var selectRows = $('#dataList').datagrid('getSelected');
+
+                if (selectRows == null) {
+                    alert("请勾选要删除的学生");
+                } else {
+                    var isid = selectRows.sid;
+                    $.ajax({
+                        type: "GET",
+                        url: "/update/DeleteStudent",
+                        data: "sid=" + isid,
+                        success: function (msg) {
+
+                            if (msg == "删除成功") {
+                                alert("删除成功")
+                                $('#dataList').datagrid("reload");
+                            }
+                        }
+                    });
+                }
+            });
+            //添加
+            //点击“添加”时弹出窗口
+            $("#add").click(function () {
+
+                $("#dlg").dialog("open");
+            })
+            //设置窗口
+            $("#dlg").dialog({
+                title: "添加学生",
+                width: 450,
+                height: 460,
+                iconCls: "icon-add",
+                modal: true,
+                collapsible: false,
+                minimizable: false,
+                maximizable: false,
+                draggable: true,
+                closed: true,
+                buttons: [{
+                    text: "添加学生",
+                    plain: true,
+                    handler: function () {
+                        var validate = $("#addForm").form("validate");
+                        if (!validate) {
+                            alert("请完整填写信息！");
+                            return;
+                        } else {
+                            $.ajax({
+                                type: "GET",
+                                url: "/update/InsertStudent",
+                                data: $("#addForm").serialize(),
+                                success: function (msg) {
+                                    if (msg == "插入成功") {
+                                        alert("添加成功！")
+                                        $("#dlg").dialog("close");
+                                        $("#add_sid").textbox('setValue', "");
+                                        $("#add_sname").textbox('setValue', "");
+                                        $("#add_sex").textbox('setValue', "男");
+                                        $("#add_en_age").textbox('setValue', "");
+                                        $("#add_en_year").textbox('setValue', "");
+                                        $("#add_clazz").textbox('setValue', "");
+                                        $('#dataList').datagrid("reload");
+                                    } else {
+                                        alert("添加失败")
+                                    }
+                                }
+                            })
+
+                        }
+
+                    }
+                }]
+
+            })
+            var temp;
+            //设置修改窗口
+            $("#edit").click(function () {
+                     var selectedRow =$("#dataList").datagrid("getSelected");
+                     var stu_id = selectedRow.sid;
+                     temp = stu_id;
+                     document.getElementById("sid1").value=temp;
+                     var stu_name = selectedRow.sname;
+                     var stu_sex = selectedRow.sex;
+                     var stu_en_age = selectedRow.en_age;
+                     var stu_en_year = selectedRow.en_year;
+                     var stu_clazz = selectedRow.clazz;
+                     $('#editForm').form('load',{
+                         sid2:stu_id,
+                         sname:stu_name,
+                         sex:stu_sex,
+                         en_age:stu_en_age,
+                         en_year:stu_en_year,
+                         clazz:stu_clazz,
+                         sid1:temp
+                 })
+                $("#dlgedit").dialog("open");
+            })
+            //编辑学生窗口
+            $("#dlgedit").dialog({
+                title:"修改信息",
+                width:450,
+                height:460,
+                modal:true,
+                iconCls: "icon-edit",
+                collapsible: false,
+                minimizable: false,
+                maximizable: false,
+                draggable: true,
+                closed: true,
+                buttons:[{
+                    text:'保存修改',
+                    plain:true,
+                    handler: function () {
+                        var validate = $("#editForm").form("validate");
+                        if (!validate) {
+                            alert("请完整填写信息！");
+                            return;
+                        } else {
+
+                            $.ajax({
+                                type: "GET",
+                                url: "/update/UpdateStudent",
+                                data: $("#editForm").serialize(),
+                                 success: function (msg) {
+                                     if (msg == "修改成功") {
+                                         alert("修改成功！")
+                                         $("#dlgedit").dialog("close");
+                                         $("#edit_sid").textbox('setValue', "");
+                                         $("#edit_sname").textbox('setValue', "");
+                                         $("#edit_sex").textbox('setValue', "男");
+                                         $("#edit_en_age").textbox('setValue', "");
+                                         $("#edit_en_year").textbox('setValue', "");
+                                         $("#edit_clazz").textbox('setValue', "");
+                                         $('#dataList').datagrid("reload");
+                                     } else {
+                                         alert("修改失败")
+                                     }
+                                 }
+                            })
+
+                        }
+
+                    }
+                }
+                ]
+            })
+            $("#search-btn").click(function () {
+                var validate = $("#serch_nameorsid").form("validate");
+
+                var res = document.getElementById("serch_nameorsid").value;
+                if (!validate) {
+                    alert("请完整填写信息！");
+                    return;
+                } else {
+                     $.ajax({
+                         type: "GET",
+                         url: "/search/SearchStudent",
+                         data: "sidorsname=" + res,
+                         success:function (json) {
+                             $('#dataList').datagrid("loadData", json);
+                         }
+                    });
+                }
+            })
+
+            $("#return").click(function () {
+                location.href="user"
+            })
+
+        })
+    </script>
+    <style>
+        #addForm
+        {
+            position:relative;
+            margin-left: 30px;
+            margin-top: 30px;
+        }
+        #editForm
+        {
+            position:relative;
+            margin-left: 30px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+
+
+<div id ="toolbar">
+    <div style="float:left"; id="return" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true">返回首页</div>
+    <!-- 增加 -->
+    <div style="float:left;">
+        <a id="add" href="javascript:;" class="easyui-linkbutton"  data-options="iconCls:'icon-add',plain:true">添加 </a>
+        <div id ="dlg" class="easyui-dialog " data-options="closed:true">
+            <form id="addForm" method="GET" data-options="closed:true, top:'100px'">
+                    <tr>
+                        <td>学号：</td>
+                        <td><input id="add_sid" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sid" data-options="required:true,missingMessage:'例：3017000001'" ></td>
+                    </tr>
+                    <br><br>
+                    <tr>
+                        <td>姓名：</td>
+                        <td><input id="add_sname" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sname" data-options="required:true,missingMessage:'例：张三'" ></td>
+                    </tr>
+                    <br><br>
+                    <tr>
+                        <td>性别：</td>
+                        <td>
+                            <select id = "add_sex" class="easyui-combobox" name="sex" style="width:100px">
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <br><br>
+                    <tr>
+                        <td>入学年龄：</td>
+                        <td><input id="add_en_age" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="en_age" data-options="required:true,missingMessage:'例：18'"   ></td>
+                    </tr>
+                    <br><br>
+                    <tr>
+                        <td>入学年份：</td>
+                        <td><input id="add_en_year" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="en_year" data-options="required:true,missingMessage:'例：2017'" ></td>
+                    </tr>
+                    <br><br>
+                    <td>
+                        <tr>班级：</tr>
+                        <tr><input id="add_clazz" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="clazz" data-options="required:true,missingMessage:'例：2017级软工二班'" ></tr>
+                    </td>
+            </form>
+        </div>
+    </div>
+
+    <!-- 分隔线 -->
+    <div style="float: left;" class="datagrid-btn-separator"></div>
+    <!-- 删除 -->
+    <div style="float:left;">
+        <a id="delete" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true"> &nbsp  &nbsp删除</a>
+    </div>
+    <!-- 分隔线 -->
+    <div style="float: left;" class="datagrid-btn-separator"></div>
+    <!-- 修改 -->
+    <div style="float:left;">
+        <a id="edit" href="javascript:;"  class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"> &nbsp  &nbsp修改</a>
+        <div id ="dlgedit" class="easyui-dialog " data-options="closed:true">
+            <form id="editForm" method="GET" data-options="closed:true">
+                <tr>
+                    <td>学号</td>
+                    <td><input id="edit_sid" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sid2" data-options="required:true,missingMessage:'请输入学号'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>姓名</td>
+                    <td><input id="edit_sname" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sname" data-options="required:true,missingMessage:'请输入姓名'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>性别</td>
+                    <td>
+                        <select id = "edit_sex" class="easyui-combobox" name="sex" style="width:200px">
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>入学年龄</td>
+                    <td><input id="edit_en_age" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="en_age" data-options="required:true,missingMessage:'请输入入学时年龄周岁（如18）'" >&nbsp;周岁</td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>入学年份</td>
+                    <td><input id="edit_en_year" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="en_year" data-options="required:true,missingMessage:'请输入入学年份（如2017）'" >&nbsp;年</td>
+                </tr>
+                <br><br>
+                <td>
+                    <tr>班级</tr>
+                    <tr><input id="edit_clazz" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="clazz" data-options="required:true,missingMessage:'请输入班级（如2017级软件工程二班）'" >&nbsp;</tr>
+                </td>
+                <input id="sid1" name="sid1" type="hidden" >
+<!--                <div style="text-align:center;padding:5px">-->
+<!--                    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">Submit</a>-->
+<!--                    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">Clear</a>-->
+<!--                </div>-->
+            </form>
+        </div>
+    </div>
+    <!-- 通过学生姓名或学号搜索 -->
+    <div id = "search" style="flowt:left;margin-top:4px;font-size: small" class="datagrid-btn-seprator"> &nbsp  &nbsp请输入学生姓名或学号&nbsp  &nbsp<input id="serch_nameorsid" class="easyui-textbox" name="search_nameorsid">
+        <a id="search-btn" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">
+            搜索</a>
+    </div>
+
+</div>
+<br>
+<table id="dataList" class="easyui-datagrid" title="学生列表"  style="width:100%;height:150%;margin: auto"
+       data-options="singleSelect:true,collapsible:true,url:'/view/StudentView',method:'get',fitcolumns:'true'">
+    <thead>
+    <tr>
+        <th data-options="field:'chk', checkbox:true, width:50"></th>
+        <th data-options="field:'sid', title:'学号', width:150, sortable:true">学号</th>
+        <th data-options="field:'sname', title:'姓名',width:300">姓名</th>
+        <th data-options="field:'sex', title:'性别', width:100">性别</th>
+        <th data-options="field:'en_age', title:'入学年龄', width:150">入学年龄</th>
+        <th data-options="field:'en_year', title:'入学年份', width:150">入学年份</th>
+        <th data-options="field:'clazz', title:'班级', width:200">班级</th>
+    </tr>
+    </thead>
+</table>
+
+<div style="margin:20px 0;"></div>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<head>
+    <meta charset="UTF-8">
+    <title>选课信息</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //删除
+            $("#delete").click(function () {
+                var selectRows = $('#dataList').datagrid('getSelected');
+
+                if (selectRows == null) {
+                    alert("请勾选要删除的选课信息");
+                } else {
+                    var isid = selectRows.sid;
+                    var icid = selectRows.cid;
+                    $.ajax({
+                        type: "GET",
+                        url: "/update/DeleteSelectedCourse",
+                        data: "sid=" + isid + "&cid=" + icid,
+                        success: function (msg) {
+
+                            if (msg == "删除成功") {
+                                alert("删除成功")
+                                $('#dataList').datagrid("reload");
+                            }
+                        }
+                    });
+                }
+            });
+
+            //添加
+            //点击“添加”时弹出窗口
+            $("#add").click(function () {
+
+                $("#dlg").dialog("open");
+            })
+            //设置窗口
+            $("#dlg").dialog({
+                title: "添加选课",
+                width: 450,
+                height: 460,
+                iconCls: "icon-add",
+                modal: true,
+                collapsible: false,
+                minimizable: false,
+                maximizable: false,
+                draggable: true,
+                closed: true,
+                buttons: [{
+                    text: "添加选课",
+                    plain: true,
+                    handler: function () {
+                        var validate = $("#addForm").form("validate");
+                        if (!validate) {
+                            alert("请完整填写信息！");
+                            return;
+                        } else {
+                            $.ajax({
+                                type: "GET",
+                                url: "/update/InsertSelectedCourse",
+                                data: $("#addForm").serialize(),
+                                success: function (msg) {
+                                    if (msg == "插入成功") {
+                                        alert("添加成功！")
+                                        $("#dlg").dialog("close");
+                                        $("#add_sid").textbox('setValue', "");
+                                        $("#add_cid").textbox('setValue', "");
+                                        $("#add_sel_year").textbox('setValue', "");
+                                        $("#add_score").textbox('setValue', "");
+                                        $('#dataList').datagrid("reload");
+                                    } else {
+                                        alert("添加失败")
+                                    }
+                                }
+                            })
+
+                        }
+
+                    }
+                }]
+
+            })
+
+            //设置修改窗口
+            $("#edit").click(function () {
+                var selectedRow =$("#dataList").datagrid("getSelected");
+                var sel_sid = selectedRow.sid;
+                var sel_cid = selectedRow.cid;
+                var sel_syear = selectedRow.sel_year;
+                var sel_score = selectedRow.score;
+                $('#editForm').form('load',{
+                    sid:sel_sid,
+                    cid:sel_cid,
+                    sel_year:sel_syear,
+                    score:sel_score
+                })
+                $("#dlgedit").dialog("open");
+            })
+            //编辑学生窗口
+            $("#dlgedit").dialog({
+                title:"修改信息",
+                width:450,
+                height:460,
+                modal:true,
+                iconCls: "icon-add",
+                collapsible: false,
+                minimizable: false,
+                maximizable: false,
+                draggable: true,
+                closed: true,
+                buttons:[{
+                    text:'保存修改',
+                    plain:true,
+                    handler: function () {
+                        var validate = $("#editForm").form("validate");
+                        if (!validate) {
+                            alert("请完整填写信息！");
+                            return;
+                        } else {
+
+                            $.ajax({
+                                type: "GET",
+                                url: "/update/UpdateSelectedCourse",
+                                data: $("#editForm").serialize(),
+                                success: function (msg) {
+                                    if (msg == "修改成功") {
+                                        alert("修改成功！")
+                                        $("#dlgedit").dialog("close");
+                                        $("#edit_sid").textbox('setValue', "");
+                                        $("#edit_cid").textbox('setValue', "");
+                                        $("#edit_sel_year").textbox('setValue', "");
+                                        $("#edit_score").textbox('setValue', "");
+                                        $('#dataList').datagrid("reload");
+                                    } else {
+                                        alert("修改失败")
+                                    }
+                                }
+                            })
+
+                        }
+
+                    }
+                }
+                ]
+            })
+
+            $("#search-btn").click(function () {
+                var validate = $("#serch_nameorsid").form("validate");
+
+                var res = document.getElementById("serch_nameorsid").value;
+                if (!validate) {
+                    alert("请完整填写信息！");
+                    return;
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "/search/SearchStudent",
+                        data: "sidorsname=" + res,
+                        success:function (json) {
+                            $('#dataList').datagrid("loadData", json);
+                        }
+                    });
+                }
+            })
+            $("#return").click(function () {
+                location.href="user"
+            })
+        })
+    </script>
+    <style>
+        #addForm
+        {
+            position:relative;
+            margin-left: 30px;
+            margin-top: 30px;
+        }
+        #editForm
+        {
+            position:relative;
+            margin-left: 30px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id ="toolbar">
+    <div style="float:left"; id="return" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true">返回首页</div>
+    <!-- 增加 -->
+    <div style="float:left;">
+        <a id="add" href="javascript:;" class="easyui-linkbutton"  data-options="iconCls:'icon-add',plain:true">添加 </a>
+        <div id ="dlg" class="easyui-dialog " data-options="closed:true">
+            <form id="addForm" method="GET" data-options="closed:true">
+                <tr>
+                    <td>学号：</td>
+                    <td><input id="add_sid" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sid" data-options="required:true,missingMessage:'例：3017000001'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>课程编号：</td>
+                    <td><input id="add_cid" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="cid" data-options="required:true,missingMessage:'例：0000001'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>选课年份：</td>
+                    <td><input id="add_sel_year" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sel_year" data-options="required:true,missingMessage:'例：2018'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>课程成绩：</td>
+                    <td><input id="add_score" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="score" data-options="required:true,missingMessage:'例：98'" ></td>
+                </tr>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- 分隔线 -->
+    <div style="float: left;" class="datagrid-btn-separator"></div>
+    <!-- 删除 -->
+    <div style="float:left;">
+        <a id="delete" href="javascript:;" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true"> &nbsp  &nbsp删除</a>
+    </div>
+    <!-- 分隔线 -->
+    <div style="float: left;" class="datagrid-btn-separator"></div>
+    <!-- 修改 -->
+    <div style="float:left;">
+        <a id="edit" href="javascript:;"  class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"> &nbsp  &nbsp修改</a>
+        <div id ="dlgedit" class="easyui-dialog " data-options="closed:true">
+            <form id="editForm" method="GET" data-options="closed:true">
+
+                <tr>
+                    <td>学号:</td>
+                    <td><input id="edit_sid" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sid" data-options="required:true,missingMessage:'请输入学号'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>课程编号:</td>
+                    <td><input id="edit_cid" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="cid" data-options="required:true,missingMessage:'请输入课程编号'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>选课年份:</td>
+                    <td><input id="edit_sel_year" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="sel_year" data-options="required:true,missingMessage:'请输入选课年份'" ></td>
+                </tr>
+                <br><br>
+                <tr>
+                    <td>课程成绩:</td>
+                    <td><input id="edit_score" style="width:200px;height:30px;" class="easyui-textbox" type="text" name="score" data-options="required:true,missingMessage:'请输入课程成绩'" ></td>
+                </tr>
+                <!--                <div style="text-align:center;padding:5px">-->
+                <!--                    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">Submit</a>-->
+                <!--                    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">Clear</a>-->
+                <!--                </div>-->
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+<table id="dataList" class="easyui-datagrid" title="选课列表"  style="width:100%;height:150%;margin: auto"
+       data-options="singleSelect:true,collapsible:true,url:'/view/SelectedCourseView',method:'get'">
+    <thead>
+    <tr>
+        <th data-options="field:'chk', checkbox:true, width:50"></th>
+        <th data-options="field:'sid', title:'学号', width:150, sortable:true">学号</th>
+        <th data-options="field:'cid', title:'课程编号',width:300">课程编号</th>
+        <th data-options="field:'sel_year', title:'性别', width:100">选课年份</th>
+        <th data-options="field:'score', title:'课程成绩', width:150">课程成绩</th>
+    </tr>
+    </thead>
+</table>
+<div style="margin:20px 0;"></div>
+<div class="easyui-panel">
+    <div class="easyui-pagination" data-options="total:114"></div>
+</div>
+</body>
+</html>

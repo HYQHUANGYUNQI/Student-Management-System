@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<script th:src= "@{/jquery.min.js}" ></script>
+<head>
+    <style>
+        a:link{		/*默认状态*/
+            color: ghostwhite;
+        }
+        a:visited{	/*浏览过的*/
+            color: ghostwhite;
+        }
+        a:hover{	/*悬浮状态*/
+            color: #6b9cde;
+        }
+        a:active { /*激活过的*/
+            color: #6b9cde;
+
+        }
+
+        a{ text-decoration:none}
+
+        body
+        {
+            background-image:url(https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1557718856984&di=df778ef02688de0b5eda1f3923398af8&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F5%2F590a94363bd8e.jpg);
+        }
+        p.welcome
+        {
+            position:fixed;
+            top:70px;
+            right:400px;
+            color:ghostwhite;
+            font-size: xx-large;
+        }
+        div.page
+        {
+            position:fixed;
+            top:230px;
+            right: 450px;
+            color: ghostwhite ;
+            font-size: large;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>学生信息管理系统</title>
+
+</head>
+<body>
+<div class="page">
+    <a href="/page/student">学生信息</a>
+    <a href="/page/course">课程信息</a>
+    <a href="/page/selectedcourse">选课信息</a>
+    <a href="/page/search">选课查询</a>
+    <a href="/page/searchscore">成绩查询</a>
+</div>
+
+<p class="welcome">
+    欢 迎 来 到 学 生 信 息 管 理 系 统
+</p>
+</body>
+</html>
